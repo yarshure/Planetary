@@ -29,6 +29,13 @@ struct SpacePhoto {
     func save() async{
         
     }
+    var smallImage:URL {
+        get {
+            
+            let dateString = SpacePhoto.sDateFormatter.string(from: date)
+            return URL(string: "https://apod.nasa.gov/apod/calendar/S_\(dateString).jpg")!
+        }
+    }
 
 }
 extension Animation {
@@ -67,7 +74,13 @@ extension SpacePhoto {
     //https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&date=2017-07-08
     static let urlTemplate = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY"
     static let dateFormat = "yyyy-MM-dd"
+    static let sdateFormat = "yyMMdd"
     
+    static var sDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.dateFormat = Self.sdateFormat
+        return formatter
+    }
     static var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.dateFormat = Self.dateFormat
@@ -416,13 +429,25 @@ struct CatalogView: View {
 //                            .listRowSeparator(.hidden)
                     }label: {
                         HStack {
-                            Image(systemName: item.media_type == "video" ? "film" : "photo")
+                            AsyncImage(url: item.smallImage) { image in
+                                image
+                                   // .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Image("default")
+                            }
+                            .frame(width: 44, height: 44)
+                            
+                                
+                          //  Image(systemName: item.media_type == "video" ? "film" : "photo")
 //                                .font(Font.title.bold())
 //                                .imageScale(.small)
 //                                .frame(width: 44, height: 44)
 //                                .padding()
 //                                .contentShape(Rectangle())
+                            
                             Text(item.title)
+                                .padding(.leading, 16)
                         }
                         
                     }
