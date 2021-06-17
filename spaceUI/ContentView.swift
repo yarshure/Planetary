@@ -431,14 +431,19 @@ struct CatalogView: View {
                         HStack {
                             AsyncImage(url: item.smallImage) { image in
                                 image
-                                   // .resizable()
-                                    .aspectRatio(contentMode: .fill)
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
+                                    .aspectRatio(contentMode: .fit)
                             } placeholder: {
                                 Image("default")
+                                    .resizable()
+                                    .frame(width: 40, height: 40)
                             }
-                            .frame(width: 44, height: 44)
-                            
-                                
+                            .clipShape(Circle())
+                            .shadow(radius: 10)
+                            .overlay(Circle().stroke(Color.mint, lineWidth: 2))
+                            .frame(width: 42, height: 42, alignment: .center)
+                          //  .background(Color.green)
                           //  Image(systemName: item.media_type == "video" ? "film" : "photo")
 //                                .font(Font.title.bold())
 //                                .imageScale(.small)
