@@ -62,8 +62,9 @@ actor ImageDownloader {
         let (data, response) = try await URLSession.shared.data(for: request)
         guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw FetchError.badID }
         let maybeImage = UIImage(data: data)
-        guard let thumbnail = await maybeImage?.thumbnail else { throw FetchError.badImage }
-        return thumbnail
+        return maybeImage!
+       // guard let thumbnail = await maybeImage?.thumbnail else { throw FetchError.badImage }
+        //return thumbnail
        // return  Image(uiImage: thumbnail)
     }
 }

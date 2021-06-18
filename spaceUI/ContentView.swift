@@ -178,6 +178,8 @@ struct CardActionButton: View {
                 .frame(width: 44, height: 44)
                 .padding()
                 .contentShape(Rectangle())
+                .foregroundColor(.mint)
+                
         }
         .buttonStyle(SquishableButtonStyle(fadeOnPress: false))
         .accessibility(label: Text(label))
@@ -231,6 +233,7 @@ struct PhotoView: View {
 //    var image:Image {
 //
 //    }
+    
     var body: some View {
         ZStack(alignment: .bottom) {
             if photo.media_type == "video" {
@@ -240,14 +243,11 @@ struct PhotoView: View {
                         .stroke(Color.gray, lineWidth: 0.5)
                 ).padding(.leading, 20).padding(.trailing, 20)
             }else {
-                AsyncImage(url: photo.url) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                } placeholder: {
-                    ProgressView()
+                if let i = bigImage {
+                    i.resizable().aspectRatio(contentMode: .fill).frame(minWidth: 0, minHeight: 400)
+                }else {
+                    ProgressView().frame(minWidth: 0, minHeight: 400)
                 }
-                .frame(minWidth: 0, minHeight: 400)
             }
             
            
@@ -256,30 +256,20 @@ struct PhotoView: View {
             if style == .cardFront {
                 HStack {
                     
-                   // Text(photo.title + " "  ) // photo.copyright ?? "No p"
-                    //    .font(.system(size: 10))
                     Spacer()
                     cardControls(for: .front)
-//                        .foregroundStyle(.mint)
-//                        .opacity(1.0)
-//                        .blendMode(BlendMode.multiply)
                 } .padding()
-                    //.background(.thinMaterial)
                 
             }
             
             if style == .cardBack {
                 VStack {
-//                    Text(photo.title ).padding(.top,40)
-//                    Spacer()
                     
                     Text(photo.description)
                         .font(.system(size: 24))
                         .padding(.all, 50)
                         .foregroundStyle(colorScheme == .dark ? .white : .black)
                         .minimumScaleFactor(0.01)  // 2
-                        //.background(.yellow)
-                        //.multilineTextAlignment(.leading)
                         
                     
                     Spacer()
@@ -288,17 +278,11 @@ struct PhotoView: View {
                             .padding()
                         cardControls(for: .back)
                     }
-                   
-                    
-                    
                 }
                 .background(.thinMaterial)
                // .padding()
               
             }
-            
-  
-
         }
         .background(.thickMaterial)
         .mask(RoundedRectangle(cornerRadius: 16))
@@ -308,7 +292,7 @@ struct PhotoView: View {
                 do {
                     print("download image\(photo.url!)")
                     let i = try await download.downloadImage(from: photo.url!)
-                    print(i)
+                    self.bigImage = Image(uiImage:i)
                 }catch {
                     print(error)
                 }
@@ -316,28 +300,14 @@ struct PhotoView: View {
             
         }
     }
+    @State var bigImage:Image?
     var title: some View {
         Text(photo.title.uppercased() + " " )//+ photo.copyright
             .padding(.horizontal, 8)
-//            .frame(maxWidth: .infinity, maxHeight: .infinity)
-//            .lineLimit(2)
-//            .multilineTextAlignment(.center)
-//            .foregroundStyle(photo.title.color)
-//            .rotationEffect(displayingAsCard ? photo.title.rotation: .degrees(0))
-//            .opacity(photo.title.opacity)
-//            .blendMode(photo.title.blendMode)
-//            .animatableFont(size: displayingAsCard ? photo.title.fontSize : 40, weight: .bold)
-//            .minimumScaleFactor(0.25)
-//            .offset(displayingAsCard ? photo.title.offset : .zero)
+
     }
     func cardControls(for side: FlipViewSide) -> some View {
         VStack {
-//            if side == .front {
-//                CardActionButton(label: "Close", systemImage: "xmark.circle.fill", action: closeAction)
-//                    .scaleEffect(displayingAsCard ? 1 : 0.5)
-//                    .opacity(displayingAsCard ? 1 : 0)
-//            }
-//            Spacer()
             CardActionButton(
                 label: side == .front ? "Open Nutrition Facts" : "Close Nutrition Facts",
                 systemImage: side == .front ? "info.circle.fill" : "arrow.left.circle.fill",
@@ -353,22 +323,24 @@ struct PhotoView: View {
 @MainActor
 class Photos: ObservableObject {
     @Published private(set) var items: [SpacePhoto] = []
-   
+    @Published var date:Date = Date()
         /// Updates `items` to a new, random list of `SpacePhoto`.
     func updateItems() async {
-        let fetched = await fetchPhotos()
+      
+        
+        let fetched = await fetchPhotos(self.date)
         items = fetched
     }
     
         /// Fetches a new, random list of `SpacePhoto`.
-    func fetchPhotos() async -> [SpacePhoto] {
+    func fetchPhotos(_ date:Date) async -> [SpacePhoto] {
+        
         var downloaded: [SpacePhoto] = []
-        for date in randomPhotoDates() {
-            let url = SpacePhoto.requestForLast(date: date, day: 10)
-            print(url)
-            if let photo = await fetchPhoto(from: url) {
-                downloaded.append(contentsOf: photo)
-            }
+        let url = SpacePhoto.requestForLast(date: date, day: 10)
+        print(url)
+        if let photo = await fetchPhoto(from: url) {
+            downloaded.removeAll()
+            downloaded.append(contentsOf: photo)
         }
         return downloaded
     }
@@ -379,8 +351,8 @@ class Photos: ObservableObject {
         /// Fetches a `SpacePhoto` from the given `URL`.
     func fetchPhoto(from url: URL) async -> [SpacePhoto]? {
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
-            print(response)
+            let (data, _) = try await URLSession.shared.data(from: url)
+            //print(response)
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy =
                 .formatted(SpacePhoto.dateFormatter)
@@ -391,6 +363,7 @@ class Photos: ObservableObject {
             return nil
         }
     }
+ 
 }
 
 struct PhotoViewCard:View {
@@ -416,58 +389,76 @@ struct PhotoViewCard:View {
         visibleSide.toggle()
     }
 }
+
 struct CatalogView: View {
-    @StateObject private var photos = Photos()
+    
+
+    @ObservedObject private var photos = Photos()
     @State private var selection: SpacePhoto.ID?
     var body: some View {
+
         NavigationView {
             List {
-                ForEach(photos.items) { item in
+                Section(header: DatePicker("Date Picker", selection:$photos.date,displayedComponents: .date)
+                            .frame(width: 200,height: 40).onTapGesture {
+                   
+//                    async {
+                    print("gogogog")
+//                        await photos.updateItems(selectionDate)
+//                    }
                     
-                    NavigationLink(tag:item.id,selection: $selection){
-                        PhotoViewCard(photo: item, presenting: true)
-//                            .listRowSeparator(.hidden)
-                    }label: {
-                        HStack {
-                            AsyncImage(url: item.smallImage) { image in
-                                image
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                                    .aspectRatio(contentMode: .fit)
-                            } placeholder: {
-                                Image("default")
-                                    .resizable()
-                                    .frame(width: 40, height: 40)
-                            }
-                            .clipShape(Circle())
-                            .shadow(radius: 10)
-                            .overlay(Circle().stroke(Color.mint, lineWidth: 2))
-                            .frame(width: 42, height: 42, alignment: .center)
-                          //  .background(Color.green)
-                          //  Image(systemName: item.media_type == "video" ? "film" : "photo")
-//                                .font(Font.title.bold())
-//                                .imageScale(.small)
-//                                .frame(width: 44, height: 44)
-//                                .padding()
-//                                .contentShape(Rectangle())
-                            
-                            Text(item.title)
-                                .padding(.leading, 16)
-                        }
+                }){
+                    ForEach(photos.items.reversed()) { item in
                         
+                        NavigationLink(tag:item.id,selection: $selection){
+                            PhotoViewCard(photo: item, presenting: true)
+                               
+                        }label: {
+                            HStack {
+                                AsyncImage(url: item.smallImage) { image in
+                                    image
+                                        .resizable()
+                                        .frame(width: 40, height: 40)
+                                        .aspectRatio(contentMode: .fit)
+                                } placeholder: {
+                                    Image("default")
+                                        .resizable()
+                                        .frame(width: 40, height: 40)
+                                }
+                                .clipShape(Circle())
+                                .shadow(radius: 10)
+                                .overlay(Circle().stroke(Color.mint, lineWidth: 2))
+                                .frame(width: 42, height: 42, alignment: .center)
+                                  
+                                Text(item.title)
+                                    .padding(.leading, 16)
+                            }
+                            
+                        }
                     }
                 }
+                
             }
-            .navigationTitle("Catalog")
+            .onReceive(photos.$date) {  date in
+                print("onReceive")
+                print(date)
+                async {
+                    await photos.updateItems()
+                }
+                
+                
+            }
+            .navigationBarTitle("Astronomy Picture of the Day",displayMode: .inline)
             .listStyle(.plain)
             .refreshable {
                 await photos.updateItems()
             }
         }
-        .task {
-            await photos.updateItems()
-        }
+//        .task {
+//            await photos.updateItems()
+//        }
     }
+   
 }
 
 struct ContentView_Previews: PreviewProvider {
