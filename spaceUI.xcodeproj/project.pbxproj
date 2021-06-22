@@ -12,6 +12,8 @@
 		187EC1E22673538D0085A6F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 187EC1E12673538D0085A6F0 /* Assets.xcassets */; };
 		187EC1E52673538E0085A6F0 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 187EC1E42673538E0085A6F0 /* Preview Assets.xcassets */; };
 		187EC1EC267366160085A6F0 /* FlipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187EC1EB267366160085A6F0 /* FlipView.swift */; };
+		1892244F26802CD80061EC8A /* FullScreenModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1892244E26802CD80061EC8A /* FullScreenModalView.swift */; };
+		1892245126803B7B0061EC8A /* ImageSaver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1892245026803B7B0061EC8A /* ImageSaver.swift */; };
 		18E458FE267B1E2C0035E7D2 /* ImageDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E458FD267B1E2C0035E7D2 /* ImageDownloader.swift */; };
 		18E45900267B28980035E7D2 /* Web.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E458FF267B28980035E7D2 /* Web.swift */; };
 		18E45927267B5C7F0035E7D2 /* Apple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18E45926267B5C7F0035E7D2 /* Apple.swift */; };
@@ -24,6 +26,9 @@
 		187EC1E12673538D0085A6F0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		187EC1E42673538E0085A6F0 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		187EC1EB267366160085A6F0 /* FlipView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlipView.swift; sourceTree = "<group>"; };
+		1892244E26802CD80061EC8A /* FullScreenModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenModalView.swift; sourceTree = "<group>"; };
+		1892245026803B7B0061EC8A /* ImageSaver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSaver.swift; sourceTree = "<group>"; };
+		18CEEC422681EA6900A27113 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		18E458FD267B1E2C0035E7D2 /* ImageDownloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDownloader.swift; sourceTree = "<group>"; };
 		18E458FF267B28980035E7D2 /* Web.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Web.swift; sourceTree = "<group>"; };
 		18E45926267B5C7F0035E7D2 /* Apple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Apple.swift; sourceTree = "<group>"; };
@@ -59,11 +64,14 @@
 		187EC1DC2673538D0085A6F0 /* spaceUI */ = {
 			isa = PBXGroup;
 			children = (
+				18CEEC422681EA6900A27113 /* Info.plist */,
 				187EC1DD2673538D0085A6F0 /* spaceUIApp.swift */,
 				187EC1DF2673538D0085A6F0 /* ContentView.swift */,
+				1892245026803B7B0061EC8A /* ImageSaver.swift */,
 				18E458FF267B28980035E7D2 /* Web.swift */,
 				18E458FD267B1E2C0035E7D2 /* ImageDownloader.swift */,
 				187EC1EB267366160085A6F0 /* FlipView.swift */,
+				1892244E26802CD80061EC8A /* FullScreenModalView.swift */,
 				187EC1E12673538D0085A6F0 /* Assets.xcassets */,
 				187EC1E32673538E0085A6F0 /* Preview Content */,
 				18E45926267B5C7F0035E7D2 /* Apple.swift */,
@@ -150,7 +158,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				18E45927267B5C7F0035E7D2 /* Apple.swift in Sources */,
+				1892244F26802CD80061EC8A /* FullScreenModalView.swift in Sources */,
 				187EC1E02673538D0085A6F0 /* ContentView.swift in Sources */,
+				1892245126803B7B0061EC8A /* ImageSaver.swift in Sources */,
 				187EC1EC267366160085A6F0 /* FlipView.swift in Sources */,
 				18E458FE267B1E2C0035E7D2 /* ImageDownloader.swift in Sources */,
 				18E45900267B28980035E7D2 /* Web.swift in Sources */,
@@ -288,6 +298,10 @@
 				DEVELOPMENT_TEAM = Z9XG3YEP93;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = spaceUI/Info.plist;
+				INFOPLIST_KEY_CFBundleExecutable = spaceUI;
+				INFOPLIST_KEY_CFBundleName = spaceUI;
+				INFOPLIST_KEY_CFBundleVersion = 1;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -318,6 +332,10 @@
 				DEVELOPMENT_TEAM = Z9XG3YEP93;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = spaceUI/Info.plist;
+				INFOPLIST_KEY_CFBundleExecutable = spaceUI;
+				INFOPLIST_KEY_CFBundleName = spaceUI;
+				INFOPLIST_KEY_CFBundleVersion = 1;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

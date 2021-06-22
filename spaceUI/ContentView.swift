@@ -29,6 +29,15 @@ struct SpacePhoto {
     func save() async{
         
     }
+    var imageURL:URL {
+        get {
+            if let hdurl = hdurl {
+                return hdurl
+            }else {
+                return url!
+            }
+        }
+    }
     var smallImage:URL {
         get {
             
@@ -233,7 +242,9 @@ struct PhotoView: View {
 //    var image:Image {
 //
 //    }
-    
+    let saver = ImageSaver()
+    @State var bigImage:Image?
+    @State private var isPresented = false
     var body: some View {
         ZStack(alignment: .bottom) {
             if photo.media_type == "video" {
@@ -249,10 +260,43 @@ struct PhotoView: View {
                     ProgressView().frame(minWidth: 0, minHeight: 400)
                 }
             }
+         
             
-           
-            
-            
+            Button("Present!") {
+                isPresented.toggle()
+                async {
+                    if photo.media_type != "video"{
+                        do {
+                            print("download image\(photo.url!)")
+                            let i = try await download.downloadImage(from: photo.imageURL)
+                            saver.writeToPhotoAlbum(image: i)
+                        }catch {
+                            print(error)
+                        }
+                    }
+                }
+            }
+            .fullScreenCover(isPresented: $isPresented,onDismiss: didDismiss) {
+                VStack {
+                    if let i = bigImage {
+                        i.resizable().aspectRatio(contentMode: .fill).frame(minWidth: 0, minHeight: 400)
+                    }else {
+                        ProgressView().frame(minWidth: 0, minHeight: 400)
+                    }
+                }.statusBar(hidden: true)
+                .onTapGesture {
+                    print("i'm long")
+                }
+                .onLongPressGesture {
+                    isPresented.toggle()
+                   
+                }
+                
+            }
+//            Button("SAVE!") {
+//                print("I don't know")
+//                //ImageSaver.init().writeToPhotoAlbum(image: bigImage!.)
+//            }
             if style == .cardFront {
                 HStack {
                     
@@ -291,7 +335,7 @@ struct PhotoView: View {
             if photo.media_type != "video"{
                 do {
                     print("download image\(photo.url!)")
-                    let i = try await download.downloadImage(from: photo.url!)
+                    let i = try await download.downloadImage(from: photo.imageURL)
                     self.bigImage = Image(uiImage:i)
                 }catch {
                     print(error)
@@ -300,7 +344,9 @@ struct PhotoView: View {
             
         }
     }
-    @State var bigImage:Image?
+    func didDismiss() {
+        
+    }
     var title: some View {
         Text(photo.title.uppercased() + " " )//+ photo.copyright
             .padding(.horizontal, 8)
